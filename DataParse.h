@@ -8,31 +8,20 @@
 #include <vector>
 
 #include "LogSystem.h"
+#include "PublicData.h"
 
 namespace data_parse
 {
     namespace fs = std::filesystem;
     namespace ls = log_system;
+    namespace pd = public_data;
     // HTML源文件路径
     const fs::path g_datasource_path = "data/source/html";
     // HTML文件后缀
     const std::string g_html_extension = ".html";
     // 用于拼接的官网URL
     const std::string g_url_to_concat = "https://www.boost.org/doc/libs/1_78_0/doc/html";
-    // 文本文件路径
-    const fs::path g_rawfile_path = "data/raw";
-    // 结构体字段间的分隔符
-    const std::string g_rd_sep = "\3";
-    // 不同HTML文件的分隔符
-    const std::string g_html_sep = "\n";
 
-    // 结果基本内容结构
-    struct ResultData
-    {
-        std::string title; // 结构标题
-        std::string body;  // 结果内容或描述
-        std::string url;   // 网址
-    };
 
     // 内容状态
     enum ContentStatus
@@ -186,7 +175,7 @@ namespace data_parse
             for (const auto &path : sources_)
             {
                 std::string out; // 存储HTML文件内容
-                struct ResultData rd;
+                struct pd::ResultData rd;
                 // 1. 读取文件
                 if (!readHtmlFile(path, out))
                 {
@@ -231,7 +220,7 @@ namespace data_parse
         bool writeToRawFile()
         {
             // 以二进制形式打开文件
-            std::fstream f(g_rawfile_path);
+            std::fstream f(pd::g_rawfile_path);
 
             if (!f.is_open())
             {
@@ -244,11 +233,11 @@ namespace data_parse
             {
                 std::string temp;
                 temp += rd.title;
-                temp += g_rd_sep;
+                temp += pd::g_rd_sep;
                 temp += rd.body;
-                temp += g_rd_sep;
+                temp += pd::g_rd_sep;
                 temp += rd.url;
-                temp += g_html_sep;
+                temp += pd::g_html_sep;
 
                 f.write(temp.c_str(), temp.size());
             }
@@ -260,7 +249,7 @@ namespace data_parse
 
     private:
         std::vector<fs::path> sources_;
-        std::vector<ResultData> results_;
+        std::vector<pd::ResultData> results_;
     };
 }
 
