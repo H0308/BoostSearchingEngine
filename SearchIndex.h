@@ -36,12 +36,12 @@ namespace search_index
     {
     public:
         // 获取正排索引结果
-        SelectedDocInfo *getForwardIndexDocInfo()
+        SelectedDocInfo *getForwardIndexDocInfo(uint64_t id)
         {
         }
 
         // 获取倒排索引结果
-        BackwardIndexElement *getBackwardIndexElement()
+        std::vector<BackwardIndexElement> *getBackwardIndexElement(const std::string &keyword)
         {
         }
 
