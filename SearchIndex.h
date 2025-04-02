@@ -5,6 +5,7 @@
 #include <unordered_map>
 #include <cstdint>
 #include <fstream>
+#include <string_view>
 
 #include <boost/algorithm/string.hpp>
 
@@ -62,15 +63,25 @@ namespace search_index
             {
                 // 构建正排索引
                 struct SelectedDocInfo *s = buildForwardIndex(line);
+                
                 if (s == nullptr)
                 {
                     ls::LOG(ls::LogLevel::WARNING) << "构建正排索引失败";
                     continue;
                 }
 
+                // debug
+                // ls::LOG(ls::LogLevel::DEBUG) << s->rd.title;
+                // ls::LOG(ls::LogLevel::DEBUG) << s->rd.body;
+                // ls::LOG(ls::LogLevel::DEBUG) << s->rd.url;
+                // ls::LOG(ls::LogLevel::DEBUG) << s->id;
+                // break;
+
                 // 构建倒排索引
                 bool flag = buildBackwardIndex(*s);
             }
+
+            return true;
         }
 
         SelectedDocInfo *buildForwardIndex(std::string &line)
@@ -93,6 +104,8 @@ namespace search_index
             sd.id = forward_index_.size();
             // 再添加SelectedDocInfo对象
             forward_index_.push_back(std::move(sd));
+
+            return &forward_index_.back();
         }
 
         // 构建倒排索引
@@ -110,8 +123,25 @@ namespace search_index
 #endif
 
         // 使用string_view自主实现split
-        void split(std::vector<std::string> &out, std::string &line, std::string sep)
+        void split(std::vector<std::string> &out, std::string_view line, std::string_view sep)
         {
+            if (line.empty())
+                return;
+
+            size_t pos = 0;
+            size_t found;
+
+            while ((found = line.find(sep, pos)) != std::string_view::npos)
+            {
+                // 添加当前位置到分隔符之间的子字符串
+                out.push_back(std::string(line.substr(pos, found - pos)));
+                // 更新位置到分隔符之后
+                pos = found + sep.length();
+            }
+
+            // 添加最后一个分隔符之后的子字符串
+            if (pos < line.length())
+                out.push_back(std::string(line.substr(pos)));
         }
 
     private:
