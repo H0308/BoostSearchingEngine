@@ -32,6 +32,13 @@ namespace search_index
         int weight;       // 权重信息
     };
 
+    // 频率结构
+    struct WordCount
+    {
+        int title_cnt;
+        int content_cnt;
+    };
+
     class SearchIndex
     {
     public:
@@ -111,6 +118,7 @@ namespace search_index
         // 构建倒排索引
         bool buildBackwardIndex(SelectedDocInfo &sd)
         {
+            
         }
 
     private:
@@ -146,7 +154,8 @@ namespace search_index
 
     private:
         std::vector<SelectedDocInfo> forward_index_;                                         // 正排索引结果
-        std::unordered_map<std::string, std::vector<BackwardIndexElement>> _backward_index_; // 倒排索引结果
+        std::unordered_map<std::string, std::vector<BackwardIndexElement>> backward_index_; // 倒排索引结果
+        std::unordered_map<std::string, WordCount> word_cnt_; // 词频统计
     };
 }
 
