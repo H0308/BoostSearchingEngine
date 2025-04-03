@@ -6,7 +6,7 @@
 #include <cstdint>
 #include <fstream>
 #include <string_view>
-
+#include <mutex>
 #include <boost/algorithm/string.hpp>
 
 #include "PublicData.h"
@@ -42,7 +42,36 @@ namespace search_index
 
     class SearchIndex
     {
+    private:
+        static const int title_weight_per = 10;
+        static const int body_weight_per = 1;
+
+        // 私有构造函数
+        SearchIndex()
+        {}
+
+        // 禁用拷贝和赋值
+        SearchIndex(const SearchIndex& si) = delete;
+        SearchIndex operator=(SearchIndex& si) = delete;
+        SearchIndex(SearchIndex&& si) = delete;
+
+        static SearchIndex* si;
     public:
+        // 获取单例对象
+        static SearchIndex* getSearchIndexInstance()
+        {
+            if(!si)
+            {
+                // 加锁
+                mtx.lock();
+                if(!si)
+                    si = new SearchIndex();
+                mtx.unlock();
+            }
+
+            return si;
+        }
+
         // 获取正排索引结果
         SelectedDocInfo *getForwardIndexDocInfo(uint64_t id)
         {
@@ -87,11 +116,18 @@ namespace search_index
 
                 // 构建倒排索引
                 bool flag = buildBackwardIndex(*s);
+
+                if (!flag)
+                {
+                    ls::LOG(ls::LogLevel::WARNING) << "构建倒排索引失败";
+                    continue;
+                }
             }
 
             return true;
         }
 
+    private:
         SelectedDocInfo *buildForwardIndex(std::string &line)
         {
             std::vector<std::string> out;
@@ -126,13 +162,26 @@ namespace search_index
             for (auto &tw : title_words)
                 word_cnt_[tw].title_cnt++;
 
+            // 统计内容中关键字出现的次数
             std::vector<std::string> body_words;
             jieba.CutForSearch(sd.rd.body, body_words);
             for (auto &bw : body_words)
                 word_cnt_[bw].body_cnt++;
-        }
 
-    private:
+            // 遍历关键字哈希表获取关键字填充对应的倒排索引节点
+            for (auto &word : word_cnt_)
+            {
+                BackwardIndexElement b;
+                b.id = sd.id;
+                b.word = word.first;
+                // 权重统计按照公式计算
+                b.weight = word.second.title_cnt * title_weight_per + word.second.body_cnt * body_weight_per;
+
+                backward_index_[b.word].push_back(std::move(b));
+            }
+
+            return true;
+        }
 #if 0
         // boost中的split
         void split(std::vector<std::string> &out, std::string &line, std::string sep)
@@ -167,7 +216,11 @@ namespace search_index
         std::vector<SelectedDocInfo> forward_index_;                                        // 正排索引结果
         std::unordered_map<std::string, std::vector<BackwardIndexElement>> backward_index_; // 倒排索引结果
         std::unordered_map<std::string, WordCount> word_cnt_;                               // 词频统计
+        static std::mutex mtx;
     };
+
+    SearchIndex* SearchIndex::si = nullptr;
+    std::mutex SearchIndex::mtx;
 }
 
 #endif
