@@ -11,6 +11,7 @@
 
 #include "PublicData.h"
 #include "LogSystem.h"
+#include "include/cppjieba/Jieba.hpp" // 引入Jieba分词
 
 namespace search_index
 {
@@ -36,7 +37,7 @@ namespace search_index
     struct WordCount
     {
         int title_cnt;
-        int content_cnt;
+        int body_cnt;
     };
 
     class SearchIndex
@@ -70,7 +71,7 @@ namespace search_index
             {
                 // 构建正排索引
                 struct SelectedDocInfo *s = buildForwardIndex(line);
-                
+
                 if (s == nullptr)
                 {
                     ls::LOG(ls::LogLevel::WARNING) << "构建正排索引失败";
@@ -118,7 +119,17 @@ namespace search_index
         // 构建倒排索引
         bool buildBackwardIndex(SelectedDocInfo &sd)
         {
-            
+            // 统计标题中关键字出现的次数
+            cppjieba::Jieba jieba;
+            std::vector<std::string> title_words;
+            jieba.CutForSearch(sd.rd.title, title_words);
+            for (auto &tw : title_words)
+                word_cnt_[tw].title_cnt++;
+
+            std::vector<std::string> body_words;
+            jieba.CutForSearch(sd.rd.body, body_words);
+            for (auto &bw : body_words)
+                word_cnt_[bw].body_cnt++;
         }
 
     private:
@@ -153,9 +164,9 @@ namespace search_index
         }
 
     private:
-        std::vector<SelectedDocInfo> forward_index_;                                         // 正排索引结果
+        std::vector<SelectedDocInfo> forward_index_;                                        // 正排索引结果
         std::unordered_map<std::string, std::vector<BackwardIndexElement>> backward_index_; // 倒排索引结果
-        std::unordered_map<std::string, WordCount> word_cnt_; // 词频统计
+        std::unordered_map<std::string, WordCount> word_cnt_;                               // 词频统计
     };
 }
 
