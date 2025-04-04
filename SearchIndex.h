@@ -53,7 +53,7 @@ namespace search_index
 
         // 禁用拷贝和赋值
         SearchIndex(const SearchIndex &si) = delete;
-        SearchIndex operator=(SearchIndex &si) = delete;
+        SearchIndex& operator=(SearchIndex &si) = delete;
         SearchIndex(SearchIndex &&si) = delete;
 
         static SearchIndex *si;
