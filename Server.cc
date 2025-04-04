@@ -11,6 +11,7 @@ void run(se::SearchEngine& s_engine, const httplib::Request& req, httplib::Respo
     if(!req.has_param("keyword"))
     {
         se::ls::LOG(se::ls::LogLevel::INFO) << "请求不存在的资源";
+        resp.status = httplib::StatusCode::NotFound_404;
         resp.set_file_content("wwwroot/404.html", "text/html");
         return;
     }

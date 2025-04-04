@@ -19,10 +19,10 @@
 git clone https://github.com/H0308/BoostSearchingEngine.git
 cd BoostSearchingEngine
 make
-./server
+./server 自定义端口号
 ```
 
-> 运行之前需要先检查环境和依赖，对于软链接需要自行配置
+> 运行之前需要先检查环境和依赖，对于软链接需要自行配置。需要注意，如果系统是CentOS，可能会因为gcc/g\+\+版本不足导致无法正常编译或者运行，请自行升级gcc/g\+\+
 
 ## 文件
 
@@ -30,3 +30,13 @@ make
 - `SearchIndex.h`：构建索引模块
 - `SearchEngine.h`：搜索引擎模块
 - `Server.cc`：服务端模块
+
+## 运行示例
+
+主页：
+
+![主页](README_Assets/image.png)
+
+搜索：
+
+![搜索](README_Assets/image1.png)
