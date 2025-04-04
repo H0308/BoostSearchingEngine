@@ -40,3 +40,7 @@ make
 搜索：
 
 ![搜索](README_Assets/image1.png)
+
+404：
+
+![404](README_Assets/image2.png)
