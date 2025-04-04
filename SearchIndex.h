@@ -102,7 +102,7 @@ namespace search_index
         // 构建索引
         bool buildIndex()
         {
-            ls::LOG(ls::LogLevel::DEBUG) << "开始建立索引";
+            ls::LOG(ls::LogLevel::INFO) << "开始建立索引";
             // 以二进制方式读取文本文件中的内容
             std::fstream in(pd::g_rawfile_path, std::ios::in | std::ios::binary);
 
@@ -146,10 +146,10 @@ namespace search_index
                 count++;
                 if (count % 50 == 0)
                 {
-                    ls::LOG(ls::LogLevel::DEBUG) << "已经建立：" << count;
+                    ls::LOG(ls::LogLevel::INFO) << "已经建立：" << count;
                 }
             }
-            ls::LOG(ls::LogLevel::DEBUG) << "建立索引完成";
+            ls::LOG(ls::LogLevel::INFO) << "建立索引完成";
 
             return true;
         }
