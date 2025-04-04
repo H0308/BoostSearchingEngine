@@ -391,7 +391,7 @@
                 
                 if (keyword) {
                     // 修改这里 - 更新URL但不改变路径，只改变参数
-                    const newUrl = '/?keyword=' + encodeURIComponent(keyword);
+                    const newUrl = '/search?keyword=' + encodeURIComponent(keyword);
                     window.history.pushState({}, '', newUrl);
                     
                     performSearch(keyword);
