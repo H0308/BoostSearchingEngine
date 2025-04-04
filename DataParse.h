@@ -148,15 +148,14 @@ namespace data_parse
         // 构建URL
         bool constructHtmlUrl(const fs::path &p, std::string *url)
         {
-            // 在本地路径中找到"/文件"
+            // 查找/data/source/html
             std::string t_path = p.string();
-            auto pos = t_path.rfind("/");
+            auto pos = t_path.find(g_datasource_path);
 
             if (pos == std::string::npos)
                 return false;
 
-            // 从/开始截取一直到结尾
-            std::string source_path = t_path.substr(pos);
+            std::string source_path = t_path.substr(pos + g_datasource_path.string().size());
             *url = g_url_to_concat + source_path;
 
             return true;

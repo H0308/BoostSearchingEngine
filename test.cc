@@ -1,11 +1,11 @@
-// #include "DataParse.h"
-// #include "SearchIndex.h"
+#include "DataParse.h"
+#include "SearchIndex.h"
 #include <iostream>
 #include <boost/algorithm/string.hpp>
 #include "SearchEngine.h"
 
-// using namespace data_parse;
-// using namespace search_index;
+using namespace data_parse;
+using namespace search_index;
 using namespace search_engine;
 
 #pragma region 数据清洗
@@ -90,8 +90,10 @@ using namespace search_engine;
 //     return EXIT_SUCCESS;
 // }
 #pragma endregion
+
 int main()
 {
+    ls::ENABLEFILELOG();
     SearchEngine se;
 
     std::string line;
@@ -101,7 +103,6 @@ int main()
         std::cout << "请输入关键字：";
         getline(std::cin, line);
         se.search(line, out);
-        // ls::LOG(ls::LogLevel::DEBUG) << out;
         std::cout << out << std::endl;
     }
 

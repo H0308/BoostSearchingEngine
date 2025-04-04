@@ -80,7 +80,6 @@ namespace search_index
             if (id < 0 || id > forward_index_.size())
             {
                 ls::LOG(ls::LogLevel::WARNING) << "不存在对应的文档ID";
-                // std::cout << "不存在对应的文档ID" << std::endl;
                 return nullptr;
             }
 
@@ -94,7 +93,6 @@ namespace search_index
             if (pos == backward_index_.end())
             {
                 ls::LOG(ls::LogLevel::WARNING) << "不存在对应的关键字";
-                // std::cout << "不存在对应的关键字" << std::endl;
                 return nullptr;
             }
 
@@ -104,9 +102,7 @@ namespace search_index
         // 构建索引
         bool buildIndex()
         {
-            // debug
             ls::LOG(ls::LogLevel::DEBUG) << "开始建立索引";
-            // std::cout << "开始建立索引" << std::endl;
             // 以二进制方式读取文本文件中的内容
             std::fstream in(pd::g_rawfile_path, std::ios::in | std::ios::binary);
 
@@ -128,7 +124,6 @@ namespace search_index
                 if (!s)
                 {
                     ls::LOG(ls::LogLevel::WARNING) << "构建正排索引失败";
-                    // std::cout << "构建正排索引失败" << std::endl;
                     continue;
                 }
 
@@ -145,7 +140,6 @@ namespace search_index
                 if (!flag)
                 {
                     ls::LOG(ls::LogLevel::WARNING) << "构建倒排索引失败";
-                    // std::cout << "构建倒排索引失败" << std::endl;
                     continue;
                 }
 
@@ -153,11 +147,9 @@ namespace search_index
                 if (count % 50 == 0)
                 {
                     ls::LOG(ls::LogLevel::DEBUG) << "已经建立：" << count;
-                    // std::cout << "已经建立：" << count << std::endl;
                 }
             }
             ls::LOG(ls::LogLevel::DEBUG) << "建立索引完成";
-            // std::cout << "建立索引完成" << std::endl;
 
             return true;
         }
@@ -215,6 +207,15 @@ namespace search_index
                 word_cnt_[tw].title_cnt++;
             }
 
+            // debug
+            // if (sd.id == 6164)
+            // {
+            //     for (auto &s : title_words)
+            //     {
+            //         std::cout << "title: " << s << std::endl;
+            //     }
+            // }
+
             // 统计内容中关键字出现的次数
             std::vector<std::string> body_words;
             jieba_.CutForSearch(sd.rd.body, body_words);
@@ -223,6 +224,15 @@ namespace search_index
                 boost::to_lower(bw);
                 word_cnt_[bw].body_cnt++;
             }
+
+            // debug
+            // if (sd.id == 6164)
+            // {
+            //     for (auto &s : body_words)
+            //     {
+            //         std::cout << "body: " << s << std::endl;
+            //     }
+            // }
 
             // 遍历关键字哈希表获取关键字填充对应的倒排索引节点
             for (auto &word : word_cnt_)

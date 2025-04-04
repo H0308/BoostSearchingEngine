@@ -93,29 +93,34 @@ namespace search_engine
         std::string getPartialBodyWithKeyword(std::string_view body, std::string_view keyword)
         {
             // 找到关键字
-            size_t pos = body.find(keyword);
-            if (pos == std::string_view::npos)
+            // size_t pos = body.find(keyword);
+            auto pos_t = std::search(body.begin(), body.end(), keyword.begin(), keyword.end(), [](char c1, char c2)
+            { 
+                return std::tolower(c1) == std::tolower(c2); 
+            });
+
+            if (pos_t == body.end())
             {
                 ls::LOG(ls::LogLevel::WARNING) << "无法找到关键字，无法截取文章内容";
-                // std::cout << "无法找到关键字，无法截取文章内容" << std::endl;
                 return "Fail to cut body, can't find keyword";
             }
+
+            int pos = std::distance(body.begin(), pos_t);
 
             // 默认起始位置为0，终止位置为body字符串最后一个字符
             int start = 0;
             int end = static_cast<int>(body.size() - 1);
 
             // 如果pos位置前有50个字符，就取前50个字符
-            if (pos - prev_words > start)
+            if (static_cast<int>(pos) - prev_words > start)
                 start = pos - prev_words;
             // 如果pos位置后有100个字符，就取后100个字符
             if (pos + static_cast<int>(keyword.size()) + after_words < end)
                 end = pos + static_cast<int>(keyword.size()) + after_words;
 
-            if (start > pos)
+            if (start > end)
             {
                 ls::LOG(ls::LogLevel::WARNING) << "内容不足，无法截取文章内容";
-                // std::cout << "内容不足，无法截取文章内容" << std::endl;
                 return "Fail to cut body, body is not enough";
             }
 
