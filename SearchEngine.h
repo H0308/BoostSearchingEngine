@@ -12,6 +12,19 @@ namespace search_engine
 {
     namespace si = search_index;
     namespace ls = log_system;
+
+    // 搜索节点结构
+    struct SearchIndexElement
+    {
+        uint64_t id;
+        std::vector<std::string> words;
+        int weight;
+
+        SearchIndexElement()
+            :id(0), weight(0)
+        {}
+    };
+
     class SearchEngine
     {
     public:
@@ -31,8 +44,11 @@ namespace search_engine
             jieba_.CutForSearch(keyword, keywords);
 
             // 查询哈希表得到结果
-            std::vector<si::BackwardIndexElement> results;
-            std::unordered_map<uint64_t, si::BackwardIndexElement> select_map;
+            // std::vector<si::BackwardIndexElement> results;
+            std::vector<SearchIndexElement> results;
+
+            // std::unordered_map<uint64_t, si::BackwardIndexElement> select_map;
+            std::unordered_map<uint64_t, SearchIndexElement> select_map;
             for (auto &word : keywords)
             {
                 // 忽略大小写
@@ -47,7 +63,16 @@ namespace search_engine
                 {
                     // 如果文档ID已经存在，说明已经存在，否则不存在
                     if (select_map.find(bi.id) == select_map.end())
-                        select_map[bi.id] = bi;
+                    {
+                        // 获取当前文档搜索结构节点，不存在自动插入，存在直接获取
+                        auto &el = select_map[bi.id];
+                        // 如果是新节点，直接赋值；如果是重复出现的节点，覆盖
+                        el.id = bi.id;
+                        // 如果是新节点，第一次添加；如果是重复节点，追加
+                        el.words.push_back(bi.word);
+                        // 如果是新节点，直接赋值；如果是重复节点，累加
+                        el.weight += bi.weight;
+                    }
                 }
             }
 
@@ -56,15 +81,17 @@ namespace search_engine
                 results.push_back(std::move(pair.second));
 
             // 按照权重排序
-            std::stable_sort(results.begin(), results.end(), [](const si::BackwardIndexElement &b1, const si::BackwardIndexElement &b2)
+            // std::stable_sort(results.begin(), results.end(), [](const si::BackwardIndexElement &b1, const si::BackwardIndexElement &b2)
+            //                  { return b1.weight > b2.weight; });
+            std::stable_sort(results.begin(), results.end(), [](const SearchIndexElement &b1, const SearchIndexElement &b2)
                              { return b1.weight > b2.weight; });
 
             // 转换为JSON字符串
             Json::Value root;
-            for (auto &bi : results)
+            for (auto &el : results)
             {
                 // 通过正排索引获取文章内容
-                si::SelectedDocInfo *sd = search_index_->getForwardIndexDocInfo(bi.id);
+                si::SelectedDocInfo *sd = search_index_->getForwardIndexDocInfo(el.id);
 
                 Json::Value item;
                 // debug
@@ -73,14 +100,16 @@ namespace search_engine
                 // item["weight"] = bi.weight;
 
                 item["title"] = sd->rd.title;
-                item["body"] = getPartialBodyWithKeyword(sd->rd.body, bi.word);
+                item["body"] = getPartialBodyWithKeyword(sd->rd.body, el.words[0]);
                 item["url"] = sd->rd.url;
 
                 // 将item作为一个JSON对象插入到root中作为子JSON对象
                 root.append(item);
             }
 
-            json_string = root.toStyledString();
+            // json_string = root.toStyledString();
+            Json::FastWriter writer;
+            json_string = writer.write(root);
         }
 
         ~SearchEngine()

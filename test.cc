@@ -1,23 +1,14 @@
-#include "DataParse.h"
+
 #include "SearchIndex.h"
 #include <iostream>
 #include <boost/algorithm/string.hpp>
 #include "SearchEngine.h"
 
-using namespace data_parse;
 using namespace search_index;
 using namespace search_engine;
 
 #pragma region 数据清洗
-// int main()
-// {
-//     DataParse d;
-//     d.getHtmlSourceFiles();
-//     d.readInfoFromHtml();
-//     d.writeToRawFile();
 
-//     return 0;
-// }
 #pragma endregion
 
 #pragma region boost中的split函数
@@ -91,20 +82,20 @@ using namespace search_engine;
 // }
 #pragma endregion
 
-int main()
-{
-    ls::ENABLEFILELOG();
-    SearchEngine se;
+// int main()
+// {
+//     // ls::ENABLEFILELOG();
+//     SearchEngine se;
 
-    std::string line;
-    std::string out;
-    while (true)
-    {
-        std::cout << "请输入关键字：";
-        getline(std::cin, line);
-        se.search(line, out);
-        std::cout << out << std::endl;
-    }
+//     std::string line;
+//     std::string out;
+//     while (true)
+//     {
+//         std::cout << "请输入关键字：";
+//         getline(std::cin, line);
+//         se.search(line, out);
+//         std::cout << out << std::endl;
+//     }
 
-    return 0;
-}
+//     return 0;
+// }

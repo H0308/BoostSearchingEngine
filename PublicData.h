@@ -14,6 +14,8 @@ namespace public_data
     const std::string g_rd_sep = "\3";
     // 不同HTML文件的分隔符
     const std::string g_html_sep = "\n";
+    // 网页根路径
+    const std::string root_path = "wwwroot";
 
     // 结果基本内容结构
     struct ResultData
