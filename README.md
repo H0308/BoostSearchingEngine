@@ -44,3 +44,83 @@ make
 404：
 
 ![404](README_Assets/image2.png)
+
+## 项目结构图
+```mermaid
+graph TD
+    Client["Client (Browser)"]:::client
+
+    subgraph "Backend Core"
+        HTTPServer["HTTP Server (Server.cc)"]:::backend
+        SearchEngine["Search Engine (SearchEngine.h)"]:::backend
+        SearchIndex["Index Construction (SearchIndex.h)"]:::backend
+        subgraph "Data Cleaning Module"
+            Parse["Parse.cc"]:::backend
+            DataParse["DataParse.h"]:::backend
+        end
+        RawData["Raw Data (data)"]:::data
+    end
+
+    subgraph "Frontend"
+        StaticInterface["Static Web Interface (wwwroot)"]:::frontend
+    end
+
+    subgraph "Utilities"
+        LogSys["Logging (LogSystem.h)"]:::utility
+        Mutex["Mutex (Mutex.h)"]:::utility
+    end
+
+    subgraph "External Libraries"
+        Boost["Boost"]:::external
+        cppHTTPLib["cpp-httplib"]:::external
+        Jieba["Jieba"]:::external
+        JsonCpp["JsonCpp"]:::external
+    end
+
+    %% Main Flow
+    Client --> HTTPServer
+    HTTPServer -->|"serves"| StaticInterface
+    HTTPServer -->|"for_search"| SearchEngine
+
+    RawData --> Parse
+    RawData --> DataParse
+    Parse --> SearchIndex
+    DataParse --> SearchIndex
+    SearchIndex --> SearchEngine
+
+    %% External Libraries connections
+    cppHTTPLib --> HTTPServer
+    Boost --> SearchIndex
+    Jieba --> Parse
+    JsonCpp --> SearchEngine
+
+    %% Utilities connections (dashed lines)
+    HTTPServer --- LogSys
+    HTTPServer --- Mutex
+    SearchEngine --- LogSys
+    SearchEngine --- Mutex
+    SearchIndex --- LogSys
+    SearchIndex --- Mutex
+    Parse --- LogSys
+    Parse --- Mutex
+    DataParse --- LogSys
+    DataParse --- Mutex
+
+    %% Click Events
+    click HTTPServer "https://github.com/h0308/boostsearchingengine/blob/main/Server.cc"
+    click Parse "https://github.com/h0308/boostsearchingengine/blob/main/Parse.cc"
+    click DataParse "https://github.com/h0308/boostsearchingengine/blob/main/DataParse.h"
+    click SearchIndex "https://github.com/h0308/boostsearchingengine/blob/main/SearchIndex.h"
+    click SearchEngine "https://github.com/h0308/boostsearchingengine/blob/main/SearchEngine.h"
+    click LogSys "https://github.com/h0308/boostsearchingengine/blob/main/LogSystem.h"
+    click Mutex "https://github.com/h0308/boostsearchingengine/blob/main/Mutex.h"
+    click StaticInterface "https://github.com/h0308/boostsearchingengine/tree/main/wwwroot"
+
+    %% Styles
+    classDef backend fill:#F5F5DC,stroke:#333,stroke-width:2px;
+    classDef frontend fill:#D0E6A5,stroke:#333,stroke-width:2px;
+    classDef data fill:#FFCCCB,stroke:#333,stroke-width:2px;
+    classDef external fill:#ADD8E6,stroke:#333,stroke-width:2px;
+    classDef utility fill:#E6E6FA,stroke:#333,stroke-width:2px;
+    classDef client fill:#FFD700,stroke:#333,stroke-width:2px;
+```
